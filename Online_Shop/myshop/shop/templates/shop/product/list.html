@@ -1,0 +1,55 @@
+    {% extends "shop/base.html" %}  <!--Наследуем от базовой страницы -->
+    {% load static %} <!-- подгружаем на страницу директорию static-->
+
+     <!--Заменяем title базовой страницы по условию-->
+    {% block title %}
+        {% if category %}{{ category.name }}{% else %}Products{% endif %}
+    {% endblock %}
+
+    {% block content %}  <!--Заполняем страницу контентом-->
+        <div id="sidebar">  <!--Блок с выбором категорий-->
+            <h3>Categories</h3>
+            <ul>
+                <li {% if not category %}class="selected"{% endif %}>
+                    <a href="{% url 'shop:product_list' %}">All</a>
+                </li>
+                <!-- Проходим циклом по списку категорий-->
+                <!--{{ name_variable }} - так подгружаем переменные -->
+                {% for c in categories %}
+                 <li {% if category.slug == c.slug %}class="selected"{% endif %}>
+                     <a href="{{ c.get_absolute_url }}">{{ c.name }}</a>
+                    </li>
+                {% endfor %}  <!--завершаем цикл-->
+            </ul>
+        </div>
+        <div id="main" class="product-list"> <!--блок со списком товаров-->
+            <!--Проверяем если есть категория то выводи иначе продукт-->
+            <h1>{% if category %}{{ category.name }}{% else %}Products{% endif %}</h1>
+            {% for product in products %} <!--запускаем цикл по продуктам-->
+                <div class="item">
+                    <!--Получаем абсалютную ссылку на продукт-->
+                    <a href=" {{ product.get_absolute_url }}">
+                    <!--Загружаем изображение-->
+                        <img src="{% if product.image %}{{ product.image.url }}{% else %}{% static 'img/no_image.png' %}
+                        {% endif %}">
+                    </a>
+                    <a href="{{ product.get_absolute_url }}">{{ product.name }}</a>
+                    <br>
+                    ${{ product.price }} <!-- получаем через переменную цену продукта-->
+                </div>
+            {% endfor %}
+        </div>
+    {% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
