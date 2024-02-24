@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'students.apps.StudentsConfig',
 ]
 
 MIDDLEWARE = [
@@ -125,3 +126,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = 'media/'  # добовляем директорию корневую
 MEDIA_ROOT = BASE_DIR / 'media'
+
+
+from django.urls import reverse_lazy   # перенаправляет на указанную страницу при логирование
+LOGIN_REDIRECT_URL = reverse_lazy('student_course_list')
