@@ -19,7 +19,13 @@ from .forms import ModuleFormSet  # импортирем класс формы
 from django.forms.models import modelform_factory  # готовый класс джанго для загрузки данных
 from django.apps import apps  # получает фактичский класс для конкретного имени модели
 from .models import Module, Content  # импортируем классы которые подвязаны на загрузке даных
-from braces.views import CsrfExemptMixin, JsonRequestResponseMixin # импортируем миксины из module django-braces
+from braces.views import CsrfExemptMixin, JsonRequestResponseMixin  # импортируем миксины из module django-braces
+from django.db.models import Count  # извлекает все значения из бд переданные в аргументе классу
+from .models import Subject  # класс котрый будет учавствовать впредставлении с подсчётом
+from django.views.generic.detail import DetailView  # детальное отображение класса
+from students.forms import CourseEnrollForm  # импортируем класс отображения формы для зачисления
+from django.views.generic.list import ListView
+
 
 
 class ManageCourseListView(ListView):
@@ -130,8 +136,8 @@ class ContentCreateUpdateView(TemplateResponseMixin, View):
 
     def dispatch(self, request, module_id, model_name, id=None):
         self.module = get_object_or_404(Module,
-                                       id=module_id,
-                                       course__owner=request.user)
+                                        id=module_id,
+                                        course__owner=request.user)
         self.model = self.get_model(model_name)
         if id:
             self.obj = get_object_or_404(self.model,
@@ -161,10 +167,12 @@ class ContentCreateUpdateView(TemplateResponseMixin, View):
         return self.render_to_response({'form': form,
                                         'object': self.obj})
 
+
 class ContentDeleteView(View):
     """
     Класс для удаления контента
     """
+
     def post(self, request, id):
         content = get_object_or_404(Content,
                                     id=id,
@@ -176,7 +184,7 @@ class ContentDeleteView(View):
 
 
 class ModuleContentListView(TemplateResponseMixin, View):
-    template_name = 'courses/manage/module/content_list.html' # url address
+    template_name = 'courses/manage/module/content_list.html'  # url address
 
     def get(self, request, module_id):
         module = get_object_or_404(Module,
@@ -186,17 +194,18 @@ class ModuleContentListView(TemplateResponseMixin, View):
 
 
 class ModuleOrderView(
-                      CsrfExemptMixin,
-                      JsonRequestResponseMixin,
-                      View
+    CsrfExemptMixin,
+    JsonRequestResponseMixin,
+    View
 ):
     """
     Класс представления для смены мест модулей
     """
+
     def post(self, request):
         for id, order in self.request_json.items():
             Module.objects.filter(id=id,
-                   course__owner=request.user).update(order=order)
+                                  course__owner=request.user).update(order=order)
         return self.render_json_response({'saved': 'OK'})
 
 
@@ -206,18 +215,43 @@ class ContentOrderView(CsrfExemptMixin,
     """
     Класс представления для работы с перетаскивания контента внутри модуля
     """
+
     def post(self, request):
         for id, order in self.request_json.items():
             Content.objects.filter(id=id,
-                       module__course__owner=request.user) \
-                       .update(order=order)
+                                   module__course__owner=request.user) \
+                .update(order=order)
         return self.render_json_response({'saved': 'OK'})
 
 
+class CourseListView(TemplateResponseMixin, View):
+    """
+    Отображает список курсов а также является стартовой страницей приложения
+    """
+    model = Course
+    template_name = 'courses/course/list.html'  # url address
+
+    def get(self, request, subject=None):
+        subjects = Subject.objects.annotate(
+            total_courses=Count('courses'))
+        courses = Course.objects.annotate(
+            total_modules=Count('modules'))
+        if subject:
+            subject = get_object_or_404(Subject, slug=subject)
+            courses = courses.filter(subject=subject)
+        return self.render_to_response({'subjects': subjects,
+                                        'subject': subject,
+                                        'courses': courses})
 
 
+class CourseDetailView(DetailView):
+    model = Course
+    template_name = 'courses/course/detail.html'
 
-
-
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['enroll_form'] = CourseEnrollForm(
+            initial={'course': self.object})
+        return context
 
 
