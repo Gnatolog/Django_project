@@ -26,8 +26,6 @@ from django.views.generic.detail import DetailView  # детальное ото�
 from students.forms import CourseEnrollForm  # импортируем класс отображения формы для зачисления
 from django.views.generic.list import ListView
 
-
-
 class ManageCourseListView(ListView):
     model = Course
     template_name = 'courses/manage/course/list.html'
@@ -253,5 +251,6 @@ class CourseDetailView(DetailView):
         context['enroll_form'] = CourseEnrollForm(
             initial={'course': self.object})
         return context
+
 
 
