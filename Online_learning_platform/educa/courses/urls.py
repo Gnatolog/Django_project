@@ -1,4 +1,4 @@
-from django.urls import path  # import model for url templates
+from django.urls import path, include # import model for url templates
 from . import views  # импортируем все классы
 
 urlpatterns = [
@@ -33,5 +33,6 @@ urlpatterns = [
          name='course_list_subject'),   # отображаем все курсы предмета
     path('<slug:slug>', views.CourseDetailView.as_view(),
          name='course_detail'),  # отображаем детальную информацию о курсе
+    path('__debug__/', include('debug_toolbar.urls')), # отображение дебагера
 
 ]
