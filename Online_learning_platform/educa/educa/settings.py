@@ -42,7 +42,9 @@ INSTALLED_APPS = [
     'embed_video',
     'debug_toolbar',            # add debug tools
     'redisboard',               # утилита отслеживания redis
-    'rest_framework'            # rest api
+    'rest_framework',           # rest api
+    'chat',                     # chat app
+    'channels',                 # channels app
 ]
 
 MIDDLEWARE = [
@@ -155,4 +157,18 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
       'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
     ]
+}
+
+
+
+ASGI_APPLICATION = 'educa.asgi.application' # определяет местонахождение конфигурации маршрутизации корня
+
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('127.0.0.1', 6379)],
+        },
+    },
 }
