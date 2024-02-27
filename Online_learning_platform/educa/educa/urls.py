@@ -27,6 +27,7 @@ urlpatterns = [
     path('course/', include('courses.urls')),
     path('', CourseListView.as_view(), name='course_list'),   # главная страница приложения отмечается "
     path('students/', include('students.urls')), # добовляем url адресса наяинающиеся с students
+    path('api/', include('courses.api.urls', namespace='api')), # подключили апи к гдавному приложению
 
 ]
 
