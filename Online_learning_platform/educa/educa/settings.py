@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'embed_video',
     'debug_toolbar',            # add debug tools
     'redisboard',               # утилита отслеживания redis
+    'rest_framework'            # rest api
 ]
 
 MIDDLEWARE = [
@@ -149,3 +150,9 @@ CACHE_MIDDLEWARE_KEY_PREFIX = 'educa'
 INTERNAL_IPS = [     # отобрадатся будет только в том случае если ip соответствует
     '127.0.0.1',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+      'rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly'
+    ]
+}
